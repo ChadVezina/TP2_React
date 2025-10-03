@@ -4,8 +4,8 @@ function NavBar() {
     return (
         <nav className="bg-blue-600 text-white p-4 flex gap-4">
             <Link to="/">Accueil</Link>
-            <Link to="/about">Forfaits</Link>
-            <Link to="/contact">À propos</Link>
+            <Link to="/forfaits">Forfaits</Link>
+            <Link to="/a-propos">À propos</Link>
         </nav>
     );
 }
