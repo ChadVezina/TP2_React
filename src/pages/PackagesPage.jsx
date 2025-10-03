@@ -1,11 +1,72 @@
-import { useState } from "react";
-import { initialPackages, addPackage, updatePackage, deletePackage, validatePackageForm, getNextId } from "../services/packageService";
+import { useEffect, useState } from "react";
+import {
+    initialPackages,
+    addPackage,
+    updatePackage,
+    deletePackage,
+    validatePackageForm,
+    getNextId,
+    fetchPackagesFromServer,
+    createPackageOnServer,
+    updatePackageOnServer,
+    deletePackageOnServer,
+} from "../services/packageService";
 
 function PackagesPage() {
     const [packages, setPackages] = useState(initialPackages);
     const [nextId, setNextId] = useState(getNextId(initialPackages));
     const [editingId, setEditingId] = useState(null); // null Si on ajoute un nouveau forfait
     const [formData, setFormData] = useState({ name: "", description: "", price: "", category: "" }); //Champs de formulaire
+    const [useServer, setUseServer] = useState(false); // Indique si les données proviennent du serveur
+    const [serverAvailable, setServerAvailable] = useState(false); // Indique si le serveur est disponible
+
+    useEffect(() => {
+        fetchPackagesFromServer()
+            .then((data) => {
+                setPackages(data);
+                setUseServer(true);
+                setServerAvailable(true);
+            })
+            .catch((error) => {
+                console.error("Json Server non disponible, utilisation des données locales.", error);
+                setUseServer(false);
+                setServerAvailable(false);
+            });
+    }, []);
+
+    // Gérer le changement de source de données (client/serveur)
+    const handleToggleDataSource = () => {
+        if (!serverAvailable && !useServer) {
+            alert("Le serveur n'est pas disponible. Impossible de basculer vers le mode serveur.");
+            return;
+        }
+
+        const newUseServer = !useServer;
+        setUseServer(newUseServer);
+
+        if (newUseServer) {
+            // Charger les données depuis le serveur
+            fetchPackagesFromServer()
+                .then((data) => {
+                    setPackages(data);
+                    setServerAvailable(true);
+                })
+                .catch((error) => {
+                    console.error("Erreur lors de la récupération des données du serveur:", error);
+                    alert("Impossible de se connecter au serveur. Retour aux données locales.");
+                    setUseServer(false);
+                    setServerAvailable(false);
+                });
+        } else {
+            // Charger les données locales
+            setPackages(initialPackages);
+            setNextId(getNextId(initialPackages));
+        }
+
+        // Réinitialiser le formulaire
+        setFormData({ name: "", description: "", price: "", category: "" });
+        setEditingId(null);
+    };
 
     // Gérer les changements dans les champs de formulaire
     const handleChange = (e) => {
@@ -20,18 +81,46 @@ function PackagesPage() {
             alert("Veuillez remplir tous les champs.");
             return;
         }
-        if (editingId === null) {
-            // Ajouter un nouveau forfait
-            const { updatedPackages, newNextId } = addPackage(packages, formData, nextId);
-            setPackages(updatedPackages);
-            setNextId(newNextId);
-        } else {
-            // Mettre à jour un forfait existant
-            const updatedPackages = updatePackage(packages, formData, editingId);
-            setPackages(updatedPackages);
+        if (!useServer) {
+            // Utiliser les données locales
+            if (editingId === null) {
+                // Ajouter un nouveau forfait
+                const { updatedPackages, newNextId } = addPackage(packages, formData, nextId);
+                setPackages(updatedPackages);
+                setNextId(newNextId);
+            } else {
+                // Mettre à jour un forfait existant
+                const updatedPackages = updatePackage(packages, formData, editingId);
+                setPackages(updatedPackages);
+            }
+            setFormData({ name: "", description: "", price: "", category: "" });
+            setEditingId(null);
         }
-        setFormData({ name: "", description: "", price: "", category: "" });
-        setEditingId(null);
+        // Utiliser Json Server
+        else {
+            if (editingId === null) {
+                // Ajouter un nouveau forfait
+                createPackageOnServer(formData)
+                    .then((data) => {
+                        setPackages((prev) => [...prev, data]);
+                        setFormData({ name: "", description: "", price: "", category: "" });
+                    })
+                    .catch((error) => {
+                        console.error("Erreur lors de l'ajout du forfait :", error);
+                    });
+            } else {
+                // Mettre à jour un forfait existant
+                updatePackageOnServer(editingId, formData)
+                    .then((data) => {
+                        setPackages((prev) => prev.map((pkg) => (pkg.id === editingId ? data : pkg)));
+                        setFormData({ name: "", description: "", price: "", category: "" });
+                        setEditingId(null);
+                    })
+                    .catch((error) => {
+                        console.error("Erreur lors de la mise à jour du forfait :", error);
+                    });
+            }
+        }
     };
 
     // Gérer la modification d'un forfait existant
@@ -48,16 +137,63 @@ function PackagesPage() {
 
     // Gérer la suppression d'un forfait
     const handleDelete = (id) => {
-        const updatedPackages = deletePackage(packages, id);
-        setPackages(updatedPackages);
-        if (id === editingId) {
-            setEditingId(null);
-            setFormData({ name: "", description: "", price: "", category: "" });
+        if (!useServer) {
+            const updatedPackages = deletePackage(packages, id);
+            setPackages(updatedPackages);
+            if (id === editingId) {
+                setEditingId(null);
+                setFormData({ name: "", description: "", price: "", category: "" });
+            }
+        } else {
+            deletePackageOnServer(id)
+                .then(() => {
+                    setPackages((prev) => prev.filter((pkg) => pkg.id !== id));
+                    if (id === editingId) {
+                        setEditingId(null);
+                        setFormData({ name: "", description: "", price: "", category: "" });
+                    }
+                })
+                .catch((error) => {
+                    console.error("Erreur lors de la suppression du forfait :", error);
+                });
         }
     };
     return (
         <div className="p-4">
             <h2 className="text-xl font-bold mb-4">Forfaits touristiques</h2>
+
+            {/* Toggle pour choisir la source de données */}
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h3 className="font-semibold text-lg mb-1">Source de données</h3>
+                        <p className="text-sm text-gray-600">
+                            Mode actuel: <span className="font-medium">{useServer ? "Serveur (JSON Server)" : "Client (données locales)"}</span>
+                        </p>
+                        {!serverAvailable && <p className="text-xs text-orange-600 mt-1">⚠️ Le serveur n'est pas disponible</p>}
+                    </div>
+                    <button
+                        onClick={handleToggleDataSource}
+                        className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                            useServer ? "bg-green-600" : "bg-gray-400"
+                        }`}
+                        title={useServer ? "Basculer vers les données locales" : "Basculer vers le serveur"}
+                    >
+                        <span
+                            className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                                useServer ? "translate-x-9" : "translate-x-1"
+                            }`}
+                        />
+                    </button>
+                </div>
+                <div className="mt-2 text-xs text-gray-500">
+                    {useServer ? (
+                        <span>✓ Les modifications seront sauvegardées sur le serveur</span>
+                    ) : (
+                        <span>✓ Les modifications seront temporaires (données locales)</span>
+                    )}
+                </div>
+            </div>
 
             {/* Formulaire d'ajout/édition de forfait */}
             <form onSubmit={handleSubmit} className="max-w-md p-4 mb-6 bg-gray-100 rounded">

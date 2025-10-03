@@ -1,0 +1,67 @@
+{
+  "packages": [
+    {
+      "id": "1",
+      "name": "Forfait Paris",
+      "description": "Visitez la ville lumière.",
+      "price": 499,
+      "category": "Ville"
+    },
+    {
+      "id": "2",
+      "name": "Forfait New York",
+      "description": "Découvrez la Big Apple.",
+      "price": 899,
+      "category": "Ville"
+    },
+    {
+      "id": "3",
+      "name": "Forfait Tokyo",
+      "description": "Explorez la capitale japonaise.",
+      "price": 1299,
+      "category": "Ville"
+    },
+    {
+      "id": "4",
+      "name": "Forfait Sydney",
+      "description": "Profitez des plages australiennes.",
+      "price": 1199,
+      "category": "Plage"
+    },
+    {
+      "id": "5",
+      "name": "Forfait Rome",
+      "description": "Plongez dans l'histoire antique.",
+      "price": 599,
+      "category": "Historique"
+    },
+    {
+      "id": "6",
+      "name": "Forfait Le Caire",
+      "description": "Admirez les pyramides majestueuses.",
+      "price": 699,
+      "category": "Historique"
+    },
+    {
+      "id": "7",
+      "name": "Forfait Rio de Janeiro",
+      "description": "Vivez le carnaval brésilien.",
+      "price": 799,
+      "category": "Festival"
+    },
+    {
+      "id": "8",
+      "name": "Forfait Cape Town",
+      "description": "Découvrez la beauté sud-africaine.",
+      "price": 1099,
+      "category": "Nature"
+    },
+    {
+      "name": "Forfait Bangkok",
+      "description": "Imprégnez-vous de la culture thaïlandaise.",
+      "price": 748,
+      "category": "Culturel",
+      "id": "9"
+    }
+  ]
+}

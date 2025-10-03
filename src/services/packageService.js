@@ -82,3 +82,78 @@ export const validatePackageForm = (formData) => {
 export const getNextId = (packages) => {
     return packages.length > 0 ? Math.max(...packages.map((p) => p.id)) + 1 : 1;
 };
+
+// ============= API / Server Functions =============
+
+const API_BASE_URL = "http://localhost:3001/packages";
+
+/**
+ * Récupérer tous les forfaits depuis le serveur
+ * @returns {Promise<Array>} - Liste des forfaits
+ */
+export const fetchPackagesFromServer = async () => {
+    const response = await fetch(API_BASE_URL);
+    if (!response.ok) {
+        throw new Error("Erreur lors de la récupération des forfaits");
+    }
+    return await response.json();
+};
+
+/**
+ * Créer un nouveau forfait sur le serveur
+ * @param {Object} formData - Données du formulaire
+ * @returns {Promise<Object>} - Le forfait créé
+ */
+export const createPackageOnServer = async (formData) => {
+    const response = await fetch(API_BASE_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: formData.name,
+            description: formData.description,
+            price: parseFloat(formData.price) || formData.price,
+            category: formData.category,
+        }),
+    });
+    if (!response.ok) {
+        throw new Error("Erreur lors de la création du forfait");
+    }
+    return await response.json();
+};
+
+/**
+ * Mettre à jour un forfait sur le serveur
+ * @param {number} id - ID du forfait à modifier
+ * @param {Object} formData - Données du formulaire
+ * @returns {Promise<Object>} - Le forfait mis à jour
+ */
+export const updatePackageOnServer = async (id, formData) => {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: formData.name,
+            description: formData.description,
+            price: parseFloat(formData.price) || formData.price,
+            category: formData.category,
+        }),
+    });
+    if (!response.ok) {
+        throw new Error("Erreur lors de la mise à jour du forfait");
+    }
+    return await response.json();
+};
+
+/**
+ * Supprimer un forfait sur le serveur
+ * @param {number} id - ID du forfait à supprimer
+ * @returns {Promise<void>}
+ */
+export const deletePackageOnServer = async (id) => {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
+        method: "DELETE",
+    });
+    if (!response.ok) {
+        throw new Error("Erreur lors de la suppression du forfait");
+    }
+};
