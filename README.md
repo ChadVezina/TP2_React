@@ -1,70 +1,67 @@
-# Getting Started with Create React App
+# Agence de voyage — front React
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Ce dépôt contient une application front-end React (bootstrapped avec Create React App) utilisée pour un TP/mini-projet d'une agence de voyage. Le projet inclut un mini-backend mock avec `json-server` qui sert les données depuis `src/db.json`.
 
-## Available Scripts
+## Pré-requis
 
-In the project directory, you can run:
+-   Node.js (>= 16 recommandé)
+-   npm (ou yarn)
 
-### `npm start`
+## Installation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. Cloner le dépôt
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+    git clone https://github.com/ChadVezina/TP2_React.git
 
-### `npm test`
+2. Installer les dépendances
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+npm install
+```
 
-### `npm run build`
+## Scripts utiles
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Les scripts définis dans `package.json` :
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+-   `npm start` : lance l'application React en mode développement (http://localhost:3000).
+-   `npm run server` : lance `json-server` et sert `src/db.json` sur le port 3001 (http://localhost:3001).
+-   `npm run build` : construit l'application pour la production dans le dossier `build`.
+-   `npm test` : lance la suite de tests fournie par Create React App.
+-   `npm run eject` : éjecte la configuration Create React App (opération irréversible).
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Exécuter l'application et le serveur de données simultanément dans deux terminaux :
 
-### `npm run eject`
+```bash
+npm run server
+npm start
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Structure du projet
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Arborescence principale (fichiers importants) :
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+-   `public/` : fichiers statiques (index.html, manifest, images).
+-   `src/` : code source React
+    -   `App.js` : point d'entrée de l'application
+    -   `index.js` : bootstrap React
+    -   `index.css` : styles globaux (Tailwind configuré)
+    -   `db.json` : données mock utilisées par `json-server`
+    -   `components/` : composants réutilisables (`Header.jsx`, `Footer.jsx`, `NavBar.jsx`)
+    -   `pages/` : pages de l'application (`HomePage.jsx`, `AboutPage.jsx`, `PackagesPage.jsx`)
+    -   `services/packageService.js` : service pour récupérer les packages depuis l'API mock
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Dépendances principales
 
-## Learn More
+-   React 19
+-   react-router-dom (pour le routage)
+-   json-server (devDependency pour mock API)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Voir la section `dependencies` et `devDependencies` dans `package.json` pour la liste complète et versions.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Exemples d'utilisation
 
-### Code Splitting
+Après `npm install` et avoir lancé `npm run server` :
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+-   Ouvrir `http://localhost:3000` pour utiliser l'application.
+-   L'API mock est disponible sur `http://localhost:3001/packages` (selon les routes définies dans `src/db.json`).
 
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
